@@ -47,12 +47,17 @@ public class HttpClientUtils {
 	/**
 	 * 连接请求最大失败次数
 	 */
-	public static final int MAX_FAIL_COUNT = 5;
+	public static final int MAX_FAIL_COUNT = 2;
 
 	/**
 	 * 请求默认失败次数
 	 */
 	public static final int DETAULT_FAIL_COUNT = 0;
+	
+	/**
+	 * 连接失败等待时长
+	 */
+	public static final int CONNECT_FAIL_WAIT_TIME = 5000;
 
 	public static final String CONTENT_TYPE_JSON_CHARSET = "application/json;charset=gbk";
 
@@ -122,6 +127,11 @@ public class HttpClientUtils {
 			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
 				throw e;
 			} else {
+				try {
+					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				faileTimes += 1;
 				simpleGetInvoke(url, params, charset, faileTimes);
 			}
@@ -159,8 +169,16 @@ public class HttpClientUtils {
 			assertStatus(response);
 		} catch (Exception e) {
 			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
+System.out.println("请求发送失败， 第：" + faileTimes + "次, 抛出异常");
 				throw e;
 			} else {
+System.out.println("请求发送失败， 第：" + faileTimes + "次，开始等待");
+				try {
+					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+System.out.println("请求发送失败， 第：" + faileTimes + "次，等待结束，重新发起请求");
 				faileTimes += 1;
 				simpleGetInvokeWithCookie(url, cookie, params, charset, faileTimes);
 			}
@@ -201,6 +219,11 @@ public class HttpClientUtils {
 			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
 				throw e;
 			} else {
+				try {
+					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				faileTimes += 1;
 				GetInvokeWithCookie(url, cookie, faileTimes);
 			}
@@ -266,6 +289,11 @@ public class HttpClientUtils {
 			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
 				throw e;
 			} else {
+				try {
+					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				faileTimes += 1;
 				getLoginCookie(url, params, charset, faileTimes);
 			}
@@ -330,6 +358,11 @@ public class HttpClientUtils {
 			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
 				throw e;
 			} else {
+				try {
+					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				faileTimes += 1;
 				simplePostInvoke(url, params, charset, faileTimes);
 			}
@@ -371,6 +404,11 @@ public class HttpClientUtils {
 			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
 				throw e;
 			} else {
+				try {
+					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				faileTimes += 1;
 				simplePostInvokeWithCookie(url, cookie, params, charset, faileTimes);
 			}

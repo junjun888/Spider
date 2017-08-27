@@ -56,20 +56,18 @@ public class QuickHelper {
 	 * @param cookie
 	 * @return
 	 */
-	public static String getDetailPage(String id, String cookie) {
+	public static String getDetailPage(String id, String cookie) throws Exception {
 		try {
 			String result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_DETAIL_BASE_URL + id, cookie);
 
 			return result;
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			throw e;
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw e;
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			throw e;
 		}
-
-		return "";
 	}
 
 	/**

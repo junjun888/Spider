@@ -132,6 +132,21 @@ public class DateUtil {
     }
 
     /**
+     * 日期格式化
+     * 20170807-- > 转为时间
+     * @param date
+     * @return
+     */
+    public static Date getDescDateFormat(String date) {
+        try {
+            return descFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * 时间格式化
      *
      * @param date

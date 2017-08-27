@@ -1,6 +1,5 @@
 package org.spider.demo;
 
-import static com.mongodb.client.model.Filters.eq;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,10 +18,14 @@ public class MogoDemo {
 			MongoDB mg = MongoUtil.getMogoDbInstance();
 			// 获取连接
 			MongoCollection<org.bson.Document> coll  = mg.getCollection();
-			coll.createIndex(eq("zhuanlihao", 1), new IndexOptions().unique(true));
+			// coll.createIndex(eq("zhuanlihao", 1), new IndexOptions().unique(true));
+			
 			Document obj = new Document();
 			Map<String, String> map = new HashMap<String, String>();
-			map.put("CN121234123", "content");
+			map.put("专利编号", "CN121234124");
+			map.put("内容", "content1");
+			
+			obj.put("1", map);
 
 			try {
 				coll.insertOne(obj);

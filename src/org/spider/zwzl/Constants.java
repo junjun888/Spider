@@ -23,7 +23,7 @@ public class Constants {
 	public final static String FILE_DOWNLOAD_END_DATE = "2017-05-07";
 
 	/**
-	 * 文件下载 的时间间隔
+	 * 文件下载 的时间间隔（天）
 	 */
 	public final static int FILE_DOWNLOAD_DATE_INTERVAL = 7;
 
@@ -38,16 +38,31 @@ public class Constants {
 	public final static String META_DATA_END_DATE = "2017-05-07";
 
 	/**
-	 * 元数据爬取 的时间间隔
+	 * 元数据爬取 的时间间隔（天）
 	 */
-	public final static int META_DATA_DATE_INTERVAL = 7;
+	public final static int META_DATA_DATE_INTERVAL = 3;
+	
+	/**
+	 * 元数据爬取 爬一个详情页后的睡眠时间
+	 */
+	public final static int DETAIL_PAGE_THREAD_WAIT_TIME = 5000;
 
 
 	// common
 	/**
+	 * 爬虫挂了以后 重启等待时间
+	 */
+	public final static int REBOOT_WAIT_TIME = 10000;
+	
+	/**
+	 * 默认 enddate
+	 */
+	public final static String DEFAULT_END_DATE = "";
+	
+	/**
 	 * 最大 请求失败次数
 	 */
-	public final static int MAX_FAIL_COUNT = 3;
+	public final static int MAX_FAIL_COUNT = 1;
 
 	/**
 	 * 默认 请求失败次数
@@ -57,7 +72,7 @@ public class Constants {
 	/**
 	 * 本地IP
 	 */
-	public final static String LOCAL_IP = "192.168.2.30";
+	public final static String LOCAL_IP = "127.0.0.1";
 
 	/**
 	 * mogodb 数据库
@@ -67,6 +82,6 @@ public class Constants {
 	/**
 	 * mogodb 表
 	 */
-	public final static String TABLE = "metadata";
+	public final static String TABLE = "metedata";
 
 }
