@@ -8,16 +8,17 @@ package org.spider.zwzl.exception;
  * <p>
  * Description:
  * </p>
- * 
+ *
  * @author 黄文俊
  * @date 2017年8月27日下午8:52:39
  * @version 1.0
  */
 public class SpiderCrashException extends RuntimeException {
 
+	private static final long serialVersionUID = -1904067580400543253L;
 	// 20170504-20170507
 	private String dateInterval;
-	
+
 	public SpiderCrashException(String dateInterval) {
 		super();
 		this.dateInterval = dateInterval;

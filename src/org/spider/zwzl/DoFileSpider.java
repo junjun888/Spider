@@ -25,7 +25,11 @@ public class DoFileSpider {
 	public static void main(String[] args) {
 		HandleExceptionAndReboot(Constants.DEFAULT_END_DATE);
 	}
-	
+
+	/**
+	 * 爬虫挂了会自动重启
+	 * @param endDate
+	 */
 	private static void HandleExceptionAndReboot(String endDate) {
 		try {
 			doSpider(endDate);
@@ -153,12 +157,12 @@ System.out.println("第：" + currentPage + "页爬取结束");
 	 * @param loginCookie
 	 * @param queryBy
 	 * @param detail
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private static void spiderOneDetailPage(String loginCookie, String queryBy, String detail, int faileTimes) throws Exception {
 		Document detailDoc = Jsoup.parse(QuickHelper.getDetailPage(detail, loginCookie));
 		Element detailContent = detailDoc.getElementById("detailCont");
-		
+
 		if (detailContent != null) {
 			Elements hrefs = detailContent.select("a[href]");
 			Element downloadHref = null;

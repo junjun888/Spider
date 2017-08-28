@@ -86,7 +86,7 @@ public class DownLoadHelper {
 		System.out.println("开始下载：" + fileName);
 		long start = System.currentTimeMillis();
 		try {
-			HttpEntity entity = HttpClientUtils.GetInvokeWithCookie(downloadLink, cookie, HttpClientUtils.DETAULT_FAIL_COUNT);
+			HttpEntity entity = HttpClientUtils.GetInvokeWithCookie(downloadLink, cookie, HttpClientUtils.DETAULT_FAIL_COUNT, HttpClientUtils.defaultProxy);
 			if (entity != null) {
 				InputStream in = entity.getContent();
 				int fileSize = in.available();

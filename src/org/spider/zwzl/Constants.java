@@ -1,5 +1,10 @@
 package org.spider.zwzl;
 
+/**
+ * 专利文档爬虫的常量类
+ * @author admin
+ *
+ */
 public class Constants {
 
 	/**
@@ -41,11 +46,11 @@ public class Constants {
 	 * 元数据爬取 的时间间隔（天）
 	 */
 	public final static int META_DATA_DATE_INTERVAL = 3;
-	
+
 	/**
 	 * 元数据爬取 爬一个详情页后的睡眠时间
 	 */
-	public final static int DETAIL_PAGE_THREAD_WAIT_TIME = 5000;
+	public final static int DETAIL_PAGE_THREAD_WAIT_TIME = 100;
 
 
 	// common
@@ -53,12 +58,12 @@ public class Constants {
 	 * 爬虫挂了以后 重启等待时间
 	 */
 	public final static int REBOOT_WAIT_TIME = 10000;
-	
+
 	/**
 	 * 默认 enddate
 	 */
 	public final static String DEFAULT_END_DATE = "";
-	
+
 	/**
 	 * 最大 请求失败次数
 	 */

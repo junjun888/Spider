@@ -2,16 +2,16 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/commons-codec-1.6.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/commons-logging-1.1.3.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/fluent-hc-4.3.6.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/httpclient-4.3.6.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/httpclient-cache-4.3.6.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/httpcore-4.3.3.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/httpmime-4.3.6.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/jsoup-1.7.3.jar" sourcepath="C:/Users/jun/AppData/Local/Temp/decompiler/source/jsoup-1.7.3-sources.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/jsoup-1.7.3-javadoc.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/jsoup-1.7.3-sources.jar"/>
-	<classpathentry kind="lib" path="F:/mylie/spiderlib/mongo-java-driver-3.2.2.jar" sourcepath="C:/Users/jun/AppData/Local/Temp/decompiler/source/mongo-java-driver-3.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/commons-codec-1.6.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/commons-logging-1.1.3.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/fluent-hc-4.3.6.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/httpclient-4.3.6.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/httpclient-cache-4.3.6.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/httpcore-4.3.3.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/httpmime-4.3.6.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/jsoup-1.7.3.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/jsoup-1.7.3-javadoc.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/jsoup-1.7.3-sources.jar"/>
+	<classpathentry kind="lib" path="D:/lib/spider/mongo-java-driver-3.2.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

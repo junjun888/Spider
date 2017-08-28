@@ -2,7 +2,7 @@ package org.spider.util;
 
 import org.spider.zwzl.Constants;
 
-public class MongoUtil {
+public final class MongoUtil {
 
 	private static MongoDB instance;
 

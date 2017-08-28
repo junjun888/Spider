@@ -18,6 +18,7 @@ public class LoginHelper {
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			System.out.println("登陆链接超时, 更换ip");
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();

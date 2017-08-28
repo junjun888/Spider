@@ -86,6 +86,7 @@ public class QuickHelper {
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			System.out.println("无法读取里面的内容");
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();

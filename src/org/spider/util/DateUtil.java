@@ -14,7 +14,7 @@ import org.jsoup.helper.StringUtil;
  * 日期工具类
  *
  */
-public class DateUtil {
+public final class DateUtil {
 
     // 默认日期格式
     public static final String DATE_DEFAULT_FORMAT = "yyyy-MM-dd";

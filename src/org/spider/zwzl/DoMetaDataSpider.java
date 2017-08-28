@@ -20,16 +20,20 @@ import org.spider.zwzl.helper.QuickHelper;
 public class DoMetaDataSpider {
 
 	private static MongoDB mg;
-	
+
 	/**
 	 * 元数据 爬虫主程序
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		HandleExceptionAndReboot(Constants.DEFAULT_END_DATE);
 	}
 
+	/**
+	 * 爬虫挂了会自动重启
+	 * @param endDate
+	 */
 	private static void HandleExceptionAndReboot(String endDate) {
 		try {
 			doSpider(endDate);
@@ -89,7 +93,7 @@ public class DoMetaDataSpider {
 
 	/**
 	 * 爬取列表页
-	 * 
+	 *
 	 * @param listHtml
 	 * @param loginCookie
 	 */
@@ -135,6 +139,7 @@ public class DoMetaDataSpider {
 			System.out.println("第：" + currentPage + "页爬取结束");
 		} else {
 			// 列表爬取完成 返回 重新生成查询条件
+			System.out.println("当前查询条件无结果, 或者当前列表已经爬取结束.");
 			return;
 		}
 	}
@@ -145,11 +150,11 @@ public class DoMetaDataSpider {
 	private static void spiderDetailPage(String loginCookie, List<String> details, String queryBy) {
 		for (String detail : details) {
 			try {
+				// 爬取到一个详情页面 睡眠一会
 				try {
-					// 爬一个详情页 睡眠一会
 					Thread.sleep(Constants.DETAIL_PAGE_THREAD_WAIT_TIME);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
 				spiderOneDetailPage(loginCookie, detail, Constants.DEFAULT_FAIL_COUNT);
 			} catch (Exception e) {
@@ -167,7 +172,7 @@ public class DoMetaDataSpider {
 
 	/**
 	 * 爬取一张详情页
-	 * 
+	 *
 	 * @param loginCookie
 	 * @param detail
 	 * @param faileTimes
@@ -185,10 +190,12 @@ public class DoMetaDataSpider {
 			Elements tds = detailContent.getElementsByTag("td");
 			Map<String, String> params = new LinkedHashMap<String, String>();
 
-			params.put("sqh", tds.get(1).childNode(0).toString());
+			params.put("申请号", tds.get(1).childNode(0).toString());
 			for (Element element : tds) {
 				if (element.attr("id") != null && element.attr("id") != "") {
-					params.put(element.attr("id"), element.childNode(0).toString());
+					String paramName = element.previousElementSibling().childNode(0).toString();
+					paramName = paramName.replace("：", "").trim();
+					params.put(paramName, element.childNode(0).toString());
 				}
 			}
 
@@ -200,7 +207,7 @@ public class DoMetaDataSpider {
 			System.out.println(params);
 			/*
 			 * obj.put(params.get("sqh"), params);
-			 * 
+			 *
 			 * try { coll.insertOne(obj); System.out.println("元数据保存成功"); } catch
 			 * (Exception e) { e.printStackTrace(); }
 			 */
