@@ -41,7 +41,7 @@ public class ThreadDemo extends Thread{
 	}
 
 	/**
-	 * 真正活的函数
+	 * 真正干活的函数
 	 * @param query
 	 * @throws Exception
 	 */

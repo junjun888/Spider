@@ -20,7 +20,6 @@ public class SpiderCrashException extends RuntimeException {
 	private String dateInterval;
 
 	public SpiderCrashException(String dateInterval) {
-		super();
 		this.dateInterval = dateInterval;
 	}
 

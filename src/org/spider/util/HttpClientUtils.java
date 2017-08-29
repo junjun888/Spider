@@ -1,14 +1,13 @@
 package org.spider.util;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
@@ -29,7 +28,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.helper.StringUtil;
-import org.spider.Constants;
 import org.spider.exception.ForbiddenException;
 
 public final class HttpClientUtils {
@@ -37,7 +35,7 @@ public final class HttpClientUtils {
 	/**
 	 * 连接超时时间
 	 */
-	public static final int CONNECTION_TIMEOUT_MS = 10000;
+	public static final int CONNECTION_TIMEOUT_MS = 20000;
 
 	/**
 	 * Cookie
@@ -47,7 +45,7 @@ public final class HttpClientUtils {
 	/**
 	 * 读取数据超时时间
 	 */
-	public static final int SO_TIMEOUT_MS = 10000;
+	public static final int SO_TIMEOUT_MS = 15000;
 
 	/**
 	 * 连接请求最大失败次数
@@ -77,21 +75,10 @@ public final class HttpClientUtils {
 
 	public static final Charset GBK = Charset.forName(CONTENT_CHARSET);
 
-	/**
-	 * 默认代理
-	 */
-	public static Proxy defaultProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(Constants.DEFAULT_PROXY_IP, Constants.DEFAULT_PROXY_HOST));
-
-
-	/**
-	 * 验证过的代理ip
-	 */
-	public static ArrayBlockingQueue<Proxy> proxyQueue;
-
-	static {
+	/*static {
 		System.out.println("扫描配置文件。。。");
 		System.out.println("加载代理ip。。。");
-		List<Proxy> proxyList = ReadIpConfigUtil.getProxyList();
+		List<Proxy> proxyList = ProxyUtil.getProxyList();
 		List<Proxy> usefulProxys = new ArrayList<Proxy>();
 
 		System.out.println("代理ip可用性测试开始。。。");
@@ -119,13 +106,7 @@ public final class HttpClientUtils {
 		}
 
 		System.out.println("代理ip可用性测试结束。。。");
-	}
-
-	public static Proxy getDefaultProxy () {
-		Proxy poll = proxyQueue.poll();
-
-		return poll;
-	}
+	}*/
 
 	/**
 	 * 测试链接，简单get调用
@@ -165,10 +146,10 @@ public final class HttpClientUtils {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public static String simpleGetInvoke(String url, Map<String, String> params)
+	/*public static String simpleGetInvoke(String url, Map<String, String> params)
 			throws ClientProtocolException, IOException, URISyntaxException {
 		return simpleGetInvoke(url, params,CONTENT_CHARSET, HttpClientUtils.DETAULT_FAIL_COUNT, HttpClientUtils.defaultProxy);
-	}
+	}*/
 
 	/**
 	 * 简单get调用
@@ -180,10 +161,10 @@ public final class HttpClientUtils {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public static String simpleGetInvoke(String url)
+	/*public static String simpleGetInvoke(String url)
 			throws ClientProtocolException, IOException, URISyntaxException {
 		return simpleGetInvoke(url, null);
-	}
+	}*/
 
 	/**
 	 * 简单get调用
@@ -195,7 +176,7 @@ public final class HttpClientUtils {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public static String simpleGetInvoke(String url, Map<String, String> params,String charset, int faileTimes, Proxy proxy)
+	/*public static String simpleGetInvoke(String url, Map<String, String> params,String charset, int faileTimes, Proxy proxy)
 			throws ClientProtocolException, IOException, URISyntaxException {
 
 		HttpClient client = buildHttpClient(true);
@@ -233,21 +214,7 @@ public final class HttpClientUtils {
 		}
 		return null;
 	}
-
-	private static void simpleGetInvokeHandler(String url, Map<String, String> params, String charset, int faileTimes,
-			Proxy proxy) throws ClientProtocolException, IOException, URISyntaxException {
-		Proxy newProxy = getNewProxy(proxy);
-
-		if (newProxy != null) {
-			System.out.println("新ip不为空, 用新ip发起请求");
-			simpleGetInvoke(url, params, charset, faileTimes, newProxy);
-		} else {
-			System.out.println("新ip为空, 用旧ip发起请求");
-			simpleGetInvoke(url, params, charset, faileTimes, proxy);
-		}
-	}
-
-
+*/
 	/**
 	 * 简单get调用  携带 cookie
 	 *
@@ -259,7 +226,7 @@ public final class HttpClientUtils {
 	 * @throws URISyntaxException
 	 */
 	public static String simpleGetInvokeWithCookie(String url,String cookie, Map<String, String> params,String charset, int faileTimes, Proxy proxy)
-			throws ClientProtocolException, IOException, URISyntaxException {
+			throws ClientProtocolException, IOException, URISyntaxException, ForbiddenException {
 
 		HttpClient client = buildHttpClient(true);
 
@@ -271,26 +238,14 @@ public final class HttpClientUtils {
 		try {
 			response = client.execute(get);
 			assertStatus(response);
+
 		} catch (ConnectTimeoutException connectTimeoutException) {
-			// TODO 模板
-			return simpleGetInvokeWithCookieHandler(url, cookie, params, charset, faileTimes, proxy);
+			throw new ForbiddenException();
 		} catch (ForbiddenException forbiddenException) {
-			simpleGetInvokeWithCookieHandler(url, cookie, params, charset, faileTimes, proxy);
+			throw new ForbiddenException();
 		} catch (Exception e) {
-			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
-System.out.println("请求发送失败， 第：" + faileTimes + "次, 更换ip重新请求");
-				simpleGetInvokeWithCookieHandler(url, cookie, params, charset, faileTimes, proxy);
-			} else {
-System.out.println("请求发送失败， 第：" + faileTimes + "次，开始等待");
-				try {
-					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-System.out.println("请求发送失败， 第：" + faileTimes + "次，等待结束，重新发起请求");
-				faileTimes += 1;
-				simpleGetInvokeWithCookie(url, cookie, params, charset, faileTimes, HttpClientUtils.defaultProxy);
-			}
+			faileTimes = reConnect(faileTimes);
+			return simpleGetInvokeWithCookie(url, cookie, params, charset, faileTimes, proxy);
 		}
 
 		HttpEntity entity = response.getEntity();
@@ -298,27 +253,10 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 		if (entity != null) {
 			String returnStr = EntityUtils.toString(entity,charset);
 			return returnStr;
-		}
-
-		return null;
-	}
-
-	private static String simpleGetInvokeWithCookieHandler(String url, String cookie, Map<String, String> params,
-			String charset, int faileTimes, Proxy proxy)
-					throws ClientProtocolException, IOException, URISyntaxException {
-		Proxy newProxy = getNewProxy(proxy);
-		String result;
-		if (newProxy != null) {
-			System.out.println("新ip不为空, 用新ip发起请求");
-			result = simpleGetInvokeWithCookie(url,cookie ,params, charset, faileTimes, newProxy);
 		} else {
-			System.out.println("新ip为空, 用旧ip发起请求");
-			result = simpleGetInvokeWithCookie(url,cookie , params, charset, faileTimes, proxy);
+			return "";
 		}
-
-		return result;
 	}
-
 
 	/**
 	 * 简单get调用  携带 cookie 返回 response entity
@@ -344,21 +282,15 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 		try {
 			response = client.execute(get);
 			assertStatus(response);
+		} catch (ConnectTimeoutException connectTimeoutException) {
+			throw new ForbiddenException();
 		} catch (ForbiddenException forbiddenException) {
-			GetInvokeWithCookieHandler(url, cookie, faileTimes, proxy);
-		}  catch (Exception e) {
-			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
-				System.out.println("请求发送失败， 第：" + faileTimes + "次, 更换ip重新请求");
-				GetInvokeWithCookieHandler(url, cookie, faileTimes, proxy);
-			} else {
-				try {
-					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-				faileTimes += 1;
-				GetInvokeWithCookie(url, cookie, faileTimes, HttpClientUtils.defaultProxy);
-			}
+			throw new ForbiddenException();
+		} catch (SocketTimeoutException e) {
+			System.out.println(Thread.currentThread().getName() + ":socket连接超时,放弃下载");
+		} catch (Exception e) {
+			faileTimes = reConnect(faileTimes);
+			return GetInvokeWithCookie(url, cookie, faileTimes, proxy);
 		}
 
 		HttpEntity entity = response.getEntity();
@@ -366,17 +298,19 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 		return entity;
 	}
 
-	private static void GetInvokeWithCookieHandler(String url, String cookie, int faileTimes, Proxy proxy)
-			throws ClientProtocolException, IOException, URISyntaxException {
-		Proxy newProxy = getNewProxy(proxy);
-
-		if (newProxy != null) {
-			System.out.println("新ip不为空, 用新ip发起请求");
-			GetInvokeWithCookie(url, cookie, faileTimes, newProxy);
-		} else {
-			System.out.println("新ip为空, 用旧ip发起请求");
-			GetInvokeWithCookie(url, cookie, faileTimes, proxy);
-		}
+	/**
+	 * 简单get调用  携带 cookie
+	 *
+	 * @param url
+	 * @param params
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	public static String simpleGetInvokeWithCookie(String url,String cookie, Map<String, String> params, Proxy proxy)
+			throws ClientProtocolException, IOException, URISyntaxException, ForbiddenException {
+		return simpleGetInvokeWithCookie(url, cookie, params, "UTF-8", HttpClientUtils.DETAULT_FAIL_COUNT, proxy);
 	}
 
 	/**
@@ -388,25 +322,11 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 * @throws URISyntaxException
+	 * @throws ForbiddenException
 	 */
-	public static String simpleGetInvokeWithCookie(String url,String cookie, Map<String, String> params)
-			throws ClientProtocolException, IOException, URISyntaxException {
-		return simpleGetInvokeWithCookie(url, cookie, params, "UTF-8", HttpClientUtils.DETAULT_FAIL_COUNT, HttpClientUtils.defaultProxy);
-	}
-
-	/**
-	 * 简单get调用  携带 cookie
-	 *
-	 * @param url
-	 * @param params
-	 * @return
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	public static String simpleGetInvokeWithCookie(String url,String cookie)
-			throws ClientProtocolException, IOException, URISyntaxException {
-		return simpleGetInvokeWithCookie(url, cookie, null, "UTF-8", HttpClientUtils.DETAULT_FAIL_COUNT, HttpClientUtils.defaultProxy);
+	public static String simpleGetInvokeWithCookie(String url, String cookie, Proxy proxy)
+			throws ClientProtocolException, IOException, URISyntaxException, ForbiddenException {
+		return simpleGetInvokeWithCookie(url, cookie, null, "UTF-8", HttpClientUtils.DETAULT_FAIL_COUNT, proxy);
 	}
 
 	/**
@@ -420,7 +340,7 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 	 * @throws URISyntaxException
 	 */
 	public static String getLoginCookie(String url, Map<String, String> params,String charset, int faileTimes, Proxy proxy)
-			throws ClientProtocolException, IOException, URISyntaxException {
+			throws ClientProtocolException, IOException, URISyntaxException, ForbiddenException {
 
 		HttpClient client = buildHttpClient(true);
 
@@ -433,28 +353,14 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 		try {
 			response = client.execute(get);
 			assertStatus(response);
+
 		} catch (ConnectTimeoutException connectTimeoutException) {
-			// TODO 模板
-			loginCookieValue = getLoginCookieHandler(url, params, charset, faileTimes, proxy);
-
-			return loginCookieValue;
+			throw new ForbiddenException();
 		} catch (ForbiddenException forbiddenException) {
-			loginCookieValue = getLoginCookieHandler(url, params, charset, faileTimes, proxy);
-
-			return loginCookieValue;
+			throw new ForbiddenException();
 		} catch (Exception e) {
-			System.out.println("请求发送失败， 第：" + faileTimes + "次, 更换ip重新请求");
-			if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
-				getLoginCookieHandler(url, params, charset, faileTimes, proxy);
-			} else {
-				try {
-					Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-				faileTimes += 1;
-				getLoginCookie(url, params, charset, faileTimes, HttpClientUtils.defaultProxy);
-			}
+			faileTimes = reConnect(faileTimes);
+			return getLoginCookie(url, params, charset, faileTimes, proxy);
 		}
 
 		loginCookieValue = response.getLastHeader("Set-Cookie").getValue();
@@ -462,7 +368,29 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 		return loginCookieValue;
 	}
 
-	private static String getLoginCookieHandler(String url, Map<String, String> params, String charset, int faileTimes,
+	/**
+	 * 重新连接
+	 * @param faileTimes
+	 * @return
+	 * @throws ForbiddenException
+	 */
+	private static int reConnect(int faileTimes) throws ForbiddenException {
+		if (faileTimes >= HttpClientUtils.MAX_FAIL_COUNT) {
+			System.out.println(Thread.currentThread().getName() + ":连接失败,切换代理");
+			throw new ForbiddenException();
+		} else {
+			System.out.println(Thread.currentThread().getName() + ":连接失败, 正在重试, 第 " + faileTimes + " 次");
+			try {
+				Thread.sleep(HttpClientUtils.CONNECT_FAIL_WAIT_TIME);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+			faileTimes += 1;
+		}
+		return faileTimes;
+	}
+
+/*	private static String getLoginCookieHandler(String url, Map<String, String> params, String charset, int faileTimes,
 			Proxy proxy) throws ClientProtocolException, IOException, URISyntaxException {
 		Proxy newProxy = getNewProxy(proxy);
 		String loginCookie;
@@ -488,7 +416,7 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 		System.out.println("将旧ip放入队列");
 		return newProxy;
 	}
-
+*/
 	/**
 	 * 获取loginCookie
 	 *
@@ -499,9 +427,9 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public static String getLoginCookie(String url)
-			throws ClientProtocolException, IOException, URISyntaxException {
-		return getLoginCookie(url, null, "UTF-8", HttpClientUtils.DETAULT_FAIL_COUNT, HttpClientUtils.defaultProxy);
+	public static String getLoginCookie(String url, Proxy proxy)
+			throws ClientProtocolException, IOException, URISyntaxException, ForbiddenException {
+		return getLoginCookie(url, null, "UTF-8", HttpClientUtils.DETAULT_FAIL_COUNT, proxy);
 	}
 
 	/**
@@ -778,7 +706,7 @@ System.out.println("请求发送失败， 第：" + faileTimes + "次，等待�
  static	void assertStatus(HttpResponse res) throws IOException, ForbiddenException{
 		Assert.notNull(res, "http响应对象为null");
 		Assert.notNull(res.getStatusLine(), "http响应对象的状态为null");
-		System.out.println("响应的状态码是:" + res.getStatusLine().getStatusCode());
+		System.out.println(Thread.currentThread().getName() + "响应的状态码是:" + res.getStatusLine().getStatusCode());
 		switch (res.getStatusLine().getStatusCode()) {
 		case HttpStatus.SC_OK:
 			break;

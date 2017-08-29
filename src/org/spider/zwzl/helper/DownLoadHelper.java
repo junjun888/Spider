@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Proxy;
 import java.net.URISyntaxException;
 
 import org.apache.http.HttpEntity;
@@ -12,6 +13,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.spider.exception.ForbiddenException;
 import org.spider.util.HttpClientUtils;
 import org.spider.zwzl.Constants;
 
@@ -38,9 +40,9 @@ public class DownLoadHelper {
 	 * @param cookie
 	 * @return
 	 */
-	public static String doAnGetDownloadHref(String cookie, String anValue) {
+	public static String doAnGetDownloadHref(String cookie, String anValue, Proxy proxy) throws ForbiddenException {
 		try {
-			String result = HttpClientUtils.simpleGetInvokeWithCookie(AN_BASE_URL + anValue, cookie);
+			String result = HttpClientUtils.simpleGetInvokeWithCookie(AN_BASE_URL + anValue, cookie, proxy);
 
 			return getDownloadLink(result);
 		} catch (ClientProtocolException e) {
@@ -49,6 +51,8 @@ public class DownLoadHelper {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
+		} catch (ForbiddenException e) {
+			throw e;
 		}
 
 		return "";
@@ -60,9 +64,9 @@ public class DownLoadHelper {
 	 * @param cookie
 	 * @return
 	 */
-	public static String doPnGetDownloadHref(String cookie, String pnValue) {
+	public static String doPnGetDownloadHref(String cookie, String pnValue, Proxy proxy) throws ForbiddenException {
 		try {
-			String result = HttpClientUtils.simpleGetInvokeWithCookie(PN_BASE_URL + pnValue, cookie);
+			String result = HttpClientUtils.simpleGetInvokeWithCookie(PN_BASE_URL + pnValue, cookie, proxy);
 
 			return getDownloadLink(result);
 		} catch (ClientProtocolException e) {
@@ -71,6 +75,8 @@ public class DownLoadHelper {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
+		} catch (ForbiddenException e) {
+			throw e;
 		}
 
 		return "";
@@ -82,11 +88,11 @@ public class DownLoadHelper {
 	 * @param cookie
 	 * @return
 	 */
-	public static void doDownLoad(String cookie, String downloadLink, String fileName, String fileDir) {
-		System.out.println("开始下载：" + fileName);
+	public static void doDownLoad(String cookie, String downloadLink, String fileName, String fileDir, Proxy proxy) throws ForbiddenException {
+		System.out.println(Thread.currentThread().getName() + "开始下载：" + fileName);
 		long start = System.currentTimeMillis();
 		try {
-			HttpEntity entity = HttpClientUtils.GetInvokeWithCookie(downloadLink, cookie, HttpClientUtils.DETAULT_FAIL_COUNT, HttpClientUtils.defaultProxy);
+			HttpEntity entity = HttpClientUtils.GetInvokeWithCookie(downloadLink, cookie, HttpClientUtils.DETAULT_FAIL_COUNT, proxy);
 			if (entity != null) {
 				InputStream in = entity.getContent();
 				int fileSize = in.available();
@@ -132,8 +138,11 @@ public class DownLoadHelper {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
+		} catch (ForbiddenException e) {
+			System.out.println(Thread.currentThread().getName() + "下载的时候代理不可用");
+			throw e;
 		} finally {
-			System.out.println("结束下载：" + fileName + "用时：" + (System.currentTimeMillis() - start) + "毫秒");
+			System.out.println(Thread.currentThread().getName() + "结束下载：" + fileName + "用时：" + (System.currentTimeMillis() - start) + "毫秒");
 		}
 	}
 

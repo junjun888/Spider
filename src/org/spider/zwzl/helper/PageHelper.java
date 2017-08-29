@@ -1,11 +1,13 @@
 package org.spider.zwzl.helper;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.http.client.ClientProtocolException;
+import org.spider.exception.ForbiddenException;
 import org.spider.util.HttpClientUtils;
 
 public class PageHelper {
@@ -19,11 +21,12 @@ public class PageHelper {
 	 * 检索的主页
 	 * @param cookie
 	 * @return
+	 * @throws ForbiddenException
 	 */
-	public static String queryNextPage(String cookie, String currentPage, String queryBy,String recordtotal) {
+	public static String queryNextPage(String cookie, String currentPage, String queryBy,String recordtotal, Proxy proxy) throws ForbiddenException {
 		try {
 			Map<String, String> params = generateParams(currentPage, queryBy, recordtotal);
-			String result = HttpClientUtils.simpleGetInvokeWithCookie(PAGE_BASE_URL, cookie, params);
+			String result = HttpClientUtils.simpleGetInvokeWithCookie(PAGE_BASE_URL, cookie, params, proxy);
 
 			return result;
 		} catch (ClientProtocolException e) {

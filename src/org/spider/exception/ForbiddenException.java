@@ -5,7 +5,7 @@ package org.spider.exception;
  * @author admin
  *
  */
-public class ForbiddenException extends Exception{
+public class ForbiddenException extends RuntimeException {
 
 	private static final long serialVersionUID = 4606863489874072836L;
 

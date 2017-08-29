@@ -1,11 +1,13 @@
 package org.spider.zwzl.helper;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.client.ClientProtocolException;
+import org.spider.exception.ForbiddenException;
 import org.spider.util.HttpClientUtils;
 
 /**
@@ -35,7 +37,7 @@ public class QuickHelper {
 	 * @param cookie
 	 * @return
 	 */
-	public static String getQuickMainPage(String cookie) {
+	/*public static String getQuickMainPage(String cookie) {
 		try {
 			String result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_URL, cookie);
 
@@ -49,16 +51,16 @@ public class QuickHelper {
 		}
 
 		return "";
-	}
+	}*/
 
 	/**
 	 * 详情页
 	 * @param cookie
 	 * @return
 	 */
-	public static String getDetailPage(String id, String cookie) throws Exception {
+	public static String getDetailPage(String id, String cookie, Proxy proxy) throws ForbiddenException, Exception {
 		try {
-			String result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_DETAIL_BASE_URL + id, cookie);
+			String result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_DETAIL_BASE_URL + id, cookie, proxy);
 
 			return result;
 		} catch (ClientProtocolException e) {
@@ -66,6 +68,10 @@ public class QuickHelper {
 		} catch (IOException e) {
 			throw e;
 		} catch (URISyntaxException e) {
+			throw e;
+		} catch (ForbiddenException e) {
+			throw new ForbiddenException();
+		} catch (Exception e) {
 			throw e;
 		}
 	}
@@ -75,21 +81,24 @@ public class QuickHelper {
 	 * @param cookie
 	 * @param params
 	 * @return
+	 * @throws ForbiddenException
 	 */
-	public static String getQuickListPage(String cookie, String dateRange) {
+	public static String getQuickListPage(String cookie, String dateRange, Proxy proxy) throws ForbiddenException {
 		try {
 			Map<String, String> params = getQueryListParams(dateRange);
 
-			String result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_PAGE_LIST_URL, cookie, params);
+			String result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_PAGE_LIST_URL, cookie, params, proxy);
 
 			return result;
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println("无法读取里面的内容");
-			e.printStackTrace();
+			System.out.println("无法读取里面的内容, 使用新代理去爬取");
+			throw new ForbiddenException();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
+		} catch (ForbiddenException e) {
+			throw e;
 		}
 
 		return "";
