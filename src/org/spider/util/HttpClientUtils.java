@@ -229,16 +229,18 @@ public final class HttpClientUtils {
 			throws ClientProtocolException, IOException, URISyntaxException, ForbiddenException {
 
 		HttpClient client = buildHttpClient(true);
+		String returnStr = "";
 
 		HttpGet get = buildHttpGet(url, params);
 		get.setHeader(COOKIE, cookie);
 		get.setConfig(HttpClientUtils.buildRequestConfig(proxy));
 		HttpResponse response = null;
+		HttpEntity entity = null;
 
 		try {
 			response = client.execute(get);
 			assertStatus(response);
-
+			entity = response.getEntity();
 		} catch (ConnectTimeoutException connectTimeoutException) {
 			throw new ForbiddenException();
 		} catch (ForbiddenException forbiddenException) {
@@ -248,14 +250,14 @@ public final class HttpClientUtils {
 			return simpleGetInvokeWithCookie(url, cookie, params, charset, faileTimes, proxy);
 		}
 
-		HttpEntity entity = response.getEntity();
-
-		if (entity != null) {
-			String returnStr = EntityUtils.toString(entity,charset);
-			return returnStr;
-		} else {
-			return "";
+		try {
+			returnStr = EntityUtils.toString(entity,charset);
+		} catch (SocketTimeoutException e) {
+			throw new ForbiddenException();
 		}
+
+
+		return returnStr;
 	}
 
 	/**
@@ -348,7 +350,7 @@ public final class HttpClientUtils {
 		get.setConfig(HttpClientUtils.buildRequestConfig(proxy));
 
 		HttpResponse response = null;
-		String loginCookieValue;
+		String loginCookieValue = null;
 
 		try {
 			response = client.execute(get);
@@ -363,7 +365,11 @@ public final class HttpClientUtils {
 			return getLoginCookie(url, params, charset, faileTimes, proxy);
 		}
 
-		loginCookieValue = response.getLastHeader("Set-Cookie").getValue();
+		try {
+			loginCookieValue = response.getLastHeader("Set-Cookie").getValue();
+		} catch (NullPointerException e) {
+			throw new ForbiddenException();
+		}
 
 		return loginCookieValue;
 	}

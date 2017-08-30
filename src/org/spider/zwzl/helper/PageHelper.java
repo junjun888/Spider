@@ -24,11 +24,11 @@ public class PageHelper {
 	 * @throws ForbiddenException
 	 */
 	public static String queryNextPage(String cookie, String currentPage, String queryBy,String recordtotal, Proxy proxy) throws ForbiddenException {
+		String result = "";
 		try {
 			Map<String, String> params = generateParams(currentPage, queryBy, recordtotal);
-			String result = HttpClientUtils.simpleGetInvokeWithCookie(PAGE_BASE_URL, cookie, params, proxy);
+			result = HttpClientUtils.simpleGetInvokeWithCookie(PAGE_BASE_URL, cookie, params, proxy);
 
-			return result;
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -37,7 +37,7 @@ public class PageHelper {
 			e.printStackTrace();
 		}
 
-		return "";
+		return result;
 	}
 
 	/**

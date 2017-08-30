@@ -58,7 +58,7 @@ public class QuickHelper {
 	 * @param cookie
 	 * @return
 	 */
-	public static String getDetailPage(String id, String cookie, Proxy proxy) throws ForbiddenException, Exception {
+	public static String getDetailPage(String id, String cookie, Proxy proxy) throws ForbiddenException, Exception{
 		try {
 			String result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_DETAIL_BASE_URL + id, cookie, proxy);
 
@@ -72,6 +72,8 @@ public class QuickHelper {
 		} catch (ForbiddenException e) {
 			throw new ForbiddenException();
 		} catch (Exception e) {
+			System.err.println(Thread.currentThread().getName() + ":getDetailPage,");
+			e.printStackTrace();
 			throw e;
 		}
 	}
@@ -84,12 +86,11 @@ public class QuickHelper {
 	 * @throws ForbiddenException
 	 */
 	public static String getQuickListPage(String cookie, String dateRange, Proxy proxy) throws ForbiddenException {
+		String result = "";
 		try {
 			Map<String, String> params = getQueryListParams(dateRange);
 
-			String result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_PAGE_LIST_URL, cookie, params, proxy);
-
-			return result;
+			result = HttpClientUtils.simpleGetInvokeWithCookie(QUICK_PAGE_LIST_URL, cookie, params, proxy);
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -99,9 +100,12 @@ public class QuickHelper {
 			e.printStackTrace();
 		} catch (ForbiddenException e) {
 			throw e;
+		} catch (Exception e) {
+			System.out.println("QuickHelper---");
+			e.printStackTrace();
 		}
 
-		return "";
+		return result;
 	}
 
 	public static Map<String, String> getQueryListParams(String dateRange) {

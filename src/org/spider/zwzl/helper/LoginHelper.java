@@ -25,6 +25,9 @@ public class LoginHelper {
 			e.printStackTrace();
 		} catch (ForbiddenException e) {
 			throw e;
+		} catch (Exception e) {
+			System.out.println("LoginHelper---");
+			e.printStackTrace();
 		}
 
 		return "";

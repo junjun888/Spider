@@ -43,7 +43,7 @@ public class Constants {
 	/**
 	 * 元数据爬取的开始日期
 	 */
-	public final static String META_DATA_START_DATE = "2017-01-01";
+	public final static String META_DATA_START_DATE = "2016-08-22";
 
 	/**
 	 * 元数据爬取的结束日期
@@ -53,7 +53,7 @@ public class Constants {
 	/**
 	 * 元数据爬取 的时间间隔（天）
 	 */
-	public final static int META_DATA_DATE_INTERVAL = 5;
+	public final static int META_DATA_DATE_INTERVAL = 3;
 
 	/**
 	 * 元数据爬取 爬一个详情页后的睡眠时间
@@ -63,7 +63,7 @@ public class Constants {
 	/**
 	 * 元数据爬取 最大线程数
 	 */
-	public final static int METADATE_MAX_THREAD = 3;
+	public final static int METADATE_MAX_THREAD = 100;
 
 
 	// common
