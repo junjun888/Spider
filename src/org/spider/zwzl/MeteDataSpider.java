@@ -31,12 +31,8 @@ import com.mongodb.client.MongoCollection;
  */
 public class MeteDataSpider extends Thread {
 
-	// TODO 要改成线程独有的变量
-	// private static Proxy proxy;
 	private static ThreadLocal<Proxy> proxys = new ThreadLocal<Proxy>();
 
-	// TODO 要改成线程独有的变量
-	// private static String loginCookie;
 	private static ThreadLocal<String> loginCookies = new ThreadLocal<String>();
 
 	private static MongoCollection<org.bson.Document> coll;
@@ -170,6 +166,7 @@ public class MeteDataSpider extends Thread {
 		} catch (Exception e) {
 			System.out.println(getCurrentThreadName() + ": 抛出了一次");
 			e.printStackTrace();
+			throw e;
 		}
 	}
 

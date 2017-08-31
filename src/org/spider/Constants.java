@@ -17,15 +17,4 @@ public class Constants {
 	 *
 	 */
 	public static final String TEST_CONN_URL = "http://www.shanghaiip.cn/wasWeb/index.jsp";
-
-	/**
-	 * 默认代理ip
-	 */
-	public static final String DEFAULT_PROXY_IP = "182.253.179.76";
-
-	/**
-	 * 默认端口号
-	 */
-	public static final int DEFAULT_PROXY_HOST = 8080;
-
 }

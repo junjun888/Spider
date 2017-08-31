@@ -35,6 +35,7 @@ public class DoMetaDataSpider {
 		doSpider();
 	}
 
+	@SuppressWarnings("static-access")
 	public static void doSpider() {
 		System.out.println("元数据，爬虫程序已启动。。。。。。。");
 

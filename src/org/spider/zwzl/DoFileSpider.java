@@ -1,14 +1,26 @@
 package org.spider.zwzl;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.spider.util.DateUtil;
+import org.spider.util.MongoUtil;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
 
 public class DoFileSpider {
 
 	private static ArrayBlockingQueue<String> queryDate;
+
+	private static MongoCollection<org.bson.Document> coll = MongoUtil.getMogoDbInstance().getCollection();
+
+	static {
+		coll.createIndex(eq("申请号", 1), new IndexOptions().unique(true));
+	}
 
 	/**
 	 * 文件爬虫 主程序
@@ -35,7 +47,7 @@ public class DoFileSpider {
 		}
 
 		for (int i = 0; i < Constants.FILE_DOWNLOAD_MAX_THREAD; i++) {
-			FileSpider fileSpider = new FileSpider(queryDate);
+			FileSpider fileSpider = new FileSpider(queryDate, coll);
 			fileSpider.start();
 		}
 	}
