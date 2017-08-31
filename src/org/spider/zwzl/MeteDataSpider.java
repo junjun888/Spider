@@ -31,9 +31,13 @@ import com.mongodb.client.MongoCollection;
  */
 public class MeteDataSpider extends Thread {
 
-	private static Proxy proxy;
+	// TODO 要改成线程独有的变量
+	// private static Proxy proxy;
+	private static ThreadLocal<Proxy> proxys = new ThreadLocal<Proxy>();
 
-	private static String loginCookie;
+	// TODO 要改成线程独有的变量
+	// private static String loginCookie;
+	private static ThreadLocal<String> loginCookies = new ThreadLocal<String>();
 
 	private static MongoCollection<org.bson.Document> coll;
 
@@ -41,7 +45,7 @@ public class MeteDataSpider extends Thread {
 
 	@SuppressWarnings("static-access")
 	public MeteDataSpider(ArrayBlockingQueue<String> queryDate, MongoCollection<org.bson.Document> coll) {
-		MeteDataSpider.proxy = ProxyUtil.getProxy();
+		proxys.set(ProxyUtil.getProxy());
 		this.queryDate = queryDate;
 		this.coll = coll;
 	}
@@ -75,7 +79,7 @@ public class MeteDataSpider extends Thread {
 			doSpider(date);
 		} catch (Exception e) {
 			System.out.println(getCurrentThreadName() + "执行任务出错了, 正切换代理,并且以指定查询条件" + date + "重新执行!");
-			proxy = ProxyUtil.getProxy();
+			proxys.set(ProxyUtil.getProxy());
 			doSpider(date);
 		}
 	}
@@ -86,9 +90,9 @@ public class MeteDataSpider extends Thread {
 	 */
 	private static void doSpider(String date) {
 		try {
-			loginCookie = LoginHelper.doLogin(proxy);
+			loginCookies.set(LoginHelper.doLogin(proxys.get()));
 			System.out.println(getCurrentThreadName() + "模拟登陆成功");
-			String zhuanliListHtml = QuickHelper.getQuickListPage(loginCookie, date, proxy);
+			String zhuanliListHtml = QuickHelper.getQuickListPage(loginCookies.get(), date, proxys.get());
 			System.out.println(getCurrentThreadName() + "开始爬取：" + date + "的数据");
 			if (StringUtil.isBlank(zhuanliListHtml)) {
 				System.out.println(getCurrentThreadName() + "爬取列表首页失败， 正在切换代理重新爬取");
@@ -98,9 +102,9 @@ public class MeteDataSpider extends Thread {
 			System.out.println(getCurrentThreadName() + "结束爬取：" + date + "的数据");
 		} catch (ForbiddenException forbiddenException) {
 			// 要捕获代理不能用的异常--> 切换代理
-			proxy = ProxyUtil.getProxy();
+			proxys.set(ProxyUtil.getProxy());
 			System.out
-					.println(getCurrentThreadName() + "获取 " + date + "的列表失败, 已经获取新代理：" + proxy + "正在以指定日期重新爬取：" + date);
+					.println(getCurrentThreadName() + "获取 " + date + "的列表失败, 已经获取新代理：" + proxys.get() + "正在以指定日期重新爬取：" + date);
 			doSpider(date);
 		} catch (Exception e) {
 			System.out.println("doSpider:");
@@ -174,8 +178,8 @@ public class MeteDataSpider extends Thread {
 	 * @return
 	 */
 	private static void changePorxy() {
-		proxy = ProxyUtil.getProxy();
-		loginCookie = LoginHelper.doLogin(proxy);
+		proxys.set(ProxyUtil.getProxy());
+		loginCookies.set(LoginHelper.doLogin(proxys.get()));
 	}
 
 	/**
@@ -199,7 +203,7 @@ public class MeteDataSpider extends Thread {
 		String nextPage = null;
 
 		try {
-			nextPage = PageHelper.queryNextPage(loginCookie, currentPage, queryBy, recordtotal, proxy);
+			nextPage = PageHelper.queryNextPage(loginCookies.get(), currentPage, queryBy, recordtotal, proxys.get());
 		} catch (ForbiddenException e) {
 			System.out.println(getCurrentThreadName() + "爬下页的过程中代理失效, 切换代理继续爬取当前页");
 			changePorxy();
@@ -260,7 +264,7 @@ public class MeteDataSpider extends Thread {
 		System.out.println(getCurrentThreadName() + "爬取元数据：");
 		Document detailDoc = null;
 		try {
-			detailDoc = Jsoup.parse(QuickHelper.getDetailPage(detail, loginCookie, proxy));
+			detailDoc = Jsoup.parse(QuickHelper.getDetailPage(detail, loginCookies.get(), proxys.get()));
 		} catch (ForbiddenException e) {
 			System.out.println(getCurrentThreadName() + "爬取详情页的时候代理不可用了, 正在切换代理重新爬取当前详情页.");
 			changePorxy();
@@ -314,9 +318,9 @@ public class MeteDataSpider extends Thread {
 					String downloadSuffix = downloadInfo[0];
 
 					if (downloadSuffix.equals("AN")) {
-						downloadLink = DownLoadHelper.doAnGetDownloadHref(loginCookie, downloadInfo[1], proxy);
+						downloadLink = DownLoadHelper.doAnGetDownloadHref(loginCookies.get(), downloadInfo[1], proxys.get());
 					} else if (downloadSuffix.equals("PN")) {
-						downloadLink = DownLoadHelper.doPnGetDownloadHref(loginCookie, downloadInfo[1], proxy);
+						downloadLink = DownLoadHelper.doPnGetDownloadHref(loginCookies.get(), downloadInfo[1], proxys.get());
 					}
 					params.put("下载链接", downloadLink);
 				}
